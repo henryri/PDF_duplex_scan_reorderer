@@ -2,15 +2,15 @@ from os import unlink
 from os.path import exists
 from unittest import TestCase
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from pypdf import PdfReader, PdfWriter
 
 from pdf_duplex_scan_reorderer import flat_zip, gen_page_order, reorder_pdf, parse_args
 
 
 class TestPdfDuplexScanReorderer(TestCase):
     def setUp(self):
-        self.output_pdf_name = "test/test_ouput.pdf"
-        self.three_page_pdf = "test/three_page_scan.pdf"
+        self.output_pdf_name = "test_ouput.pdf"
+        self.three_page_pdf = "three_page_scan.pdf"
 
     def tearDown(self):
         if exists(self.output_pdf_name):
@@ -34,14 +34,14 @@ class TestPdfDuplexScanReorderer(TestCase):
 
         reorder_pdf(input_filename=self.three_page_pdf, output_filename=self.output_pdf_name)
         with open(self.output_pdf_name, "rb") as output_file:
-            reader = PdfFileReader(output_file)
-            self.assertEqual(reader.getNumPages(), 3,
+            reader = PdfReader(output_file)
+            self.assertEqual(len(reader.pages), 3,
                              msg="Resulting PDF should have 3 pages, as did the input")
 
     def _create_three_page_pdf(self):
-        writer = PdfFileWriter()
+        writer = PdfWriter()
         for _ in range(3):
-            writer.addBlankPage(200, 400)
+            writer.add_blank_page(200, 400)
         with open(self.three_page_pdf, "wb") as three_page_pdf_file:
             writer.write(three_page_pdf_file)
 

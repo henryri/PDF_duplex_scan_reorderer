@@ -2,7 +2,7 @@ import math
 from itertools import zip_longest
 from typing import Iterator
 
-from PyPDF2 import PdfFileReader, PdfFileWriter
+from pypdf import PdfReader, PdfWriter
 
 
 def flat_zip(*iterators: Iterator, zip_function=zip):
@@ -48,13 +48,13 @@ def reorder_pdf(input_filename: str, output_filename: str):
     :param output_filename: filename of the file to save the reordered pdf to
     """
     with open(input_filename, "rb") as readfile:
-        input_pdf = PdfFileReader(readfile)
-        page_cnt = input_pdf.getNumPages()
+        input_pdf = PdfReader(readfile)
+        page_cnt = len(input_pdf.pages)
         pages_ordered = gen_page_order(page_cnt)
         with open(output_filename, "wb") as writefile:
-            output_pdf = PdfFileWriter()
+            output_pdf = PdfWriter()
             for page_no in pages_ordered:
-                output_pdf.addPage(input_pdf.getPage(page_no))
+                output_pdf.add_page(input_pdf.pages[page_no])
             output_pdf.write(writefile)
 
 
