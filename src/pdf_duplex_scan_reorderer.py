@@ -1,7 +1,7 @@
 import math
 from itertools import zip_longest
 from typing import Iterator
-
+import os
 from pypdf import PdfReader, PdfWriter
 
 
@@ -37,7 +37,7 @@ def gen_page_order(page_cnt: int):
     return pages_ordered
 
 
-def reorder_pdf(input_filename: str, output_filename: str):
+def reorder_pdf(input_filename: str):
     """
     Reorders pages in a PDF:
         it assumes you scanned front pages first and than the back pages in inverse order
@@ -45,17 +45,19 @@ def reorder_pdf(input_filename: str, output_filename: str):
 
         In case of an odd page number, it assumes, the last page does not have a (scanned) back side
     :param input_filename: name of the pdf to reorder
-    :param output_filename: filename of the file to save the reordered pdf to
     """
+    temp_filename = input_filename + ".tmp"
     with open(input_filename, "rb") as readfile:
         input_pdf = PdfReader(readfile)
         page_cnt = len(input_pdf.pages)
         pages_ordered = gen_page_order(page_cnt)
-        with open(output_filename, "wb") as writefile:
+        with open(temp_filename, "wb") as writefile:
             output_pdf = PdfWriter()
             for page_no in pages_ordered:
                 output_pdf.add_page(input_pdf.pages[page_no])
             output_pdf.write(writefile)
+    os.remove(input_filename)
+    os.rename(temp_filename, input_filename)
 
 
 def parse_args(args=None):
@@ -67,7 +69,6 @@ def parse_args(args=None):
 
             In case of an odd page number, it assumes, the last page does not have a (scanned) back side""")
     parser.add_argument("input", help="Name of PDF to reorder")
-    parser.add_argument("output", help="Name of file to save the reordered pdf to")
     args = parser.parse_args(args)
     return args
 
@@ -76,7 +77,7 @@ def main():
     """ main function """
     args = parse_args()
 
-    reorder_pdf(input_filename=args.input, output_filename=args.output)
+    reorder_pdf(input_filename=args.input)
 
 
 if __name__ == '__main__':
