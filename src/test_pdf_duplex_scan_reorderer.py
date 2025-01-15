@@ -32,7 +32,7 @@ class TestPdfDuplexScanReorderer(TestCase):
     def test_real_pdf_reorder(self):
         self._create_three_page_pdf()
 
-        reorder_pdf(input_filename=self.three_page_pdf, output_filename=self.output_pdf_name)
+        reorder_pdf(input_filename=self.output_pdf_name)
         with open(self.output_pdf_name, "rb") as output_file:
             reader = PdfReader(output_file)
             self.assertEqual(len(reader.pages), 3,
@@ -46,6 +46,5 @@ class TestPdfDuplexScanReorderer(TestCase):
             writer.write(three_page_pdf_file)
 
     def test_argparser(self):
-        res = parse_args(args=["1", "2"])
+        res = parse_args(args=["1"])
         self.assertEqual(res.input, "1")
-        self.assertEqual(res.output, "2")
